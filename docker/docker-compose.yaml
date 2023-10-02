@@ -1,0 +1,74 @@
+version: '3'
+services:
+  queue:
+    container_name: queue
+    image: rabbitmq:3.8-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./config/rabbitconf.json:/etc/rabbitmq/rabbitconf.json:ro      
+    networks:
+      - assign-network
+
+  assign-publisher-notification:
+    tty: true
+    stdin_open: true
+    container_name: assign-publisher-notification
+    build:
+      context: ..
+      dockerfile: assign-publisher-notification/src/main/docker/Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - queue
+    networks:
+      - assign-network   
+
+  postgres-db:
+      container_name: postgres-db
+      image: postgres:latest
+      environment:
+        POSTGRES_USER: assign
+        POSTGRES_PASSWORD: assign
+        POSTGRES_DB: postgres
+      networks:
+        - assign-network
+      ports:
+        - "5432:5432"
+
+  assign-consumer-notification:
+    tty: true
+    stdin_open: true
+    container_name: assign-consumer-notification
+    build:
+      context: ..
+      dockerfile: assign-consumer-notification/src/main/docker/Dockerfile
+    ports:
+      - "8082:8080"
+    depends_on:      
+      - postgres-db
+    networks:
+      - assign-network         
+
+  report-subscriptions:
+    tty: true
+    stdin_open: true
+    container_name: report-subscriptions
+    build:
+      context: ..
+      dockerfile: report-subscriptions/src/main/docker/Dockerfile
+    ports:
+      - "8083:8080"
+    depends_on:      
+      - postgres-db
+    networks:
+      - assign-network          
+
+networks:
+  assign-network:
+    driver: bridge
+
