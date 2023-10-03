@@ -62,11 +62,11 @@ Grupo de microserviços de gestão de assinaturas através de mensageria
 # Instruções de Execução
 
 1. Clone o projeto: 
- ```git clone git@github.com:SelecaoGlobocom/nayferreira.git```
+ ```git clone https://github.com/nfers/ms-plataform-assign-group.git```
 
 2. Acesse o repositório: 
 
-```cd nayferreira```
+```cd ms-plataform-assign-group```
 
 4. Execute o conteiner:
 
